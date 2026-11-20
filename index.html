@@ -1,0 +1,86 @@
+<!doctype html><html lang="pl"><head><meta name="robots" content="noindex, nofollow"><style>@font-face { font-family: "Noto Serif"; src: url("fonts/NotoSerif.ttf"); font-weight: 100 900; }@font-face { font-family: "Noto Sans"; src: url("fonts/NotoSans-Regular.ttf"); font-weight: 400; }@font-face { font-family: "Noto Sans"; src: url("fonts/NotoSans-Bold.ttf"); font-weight: 700; }</style><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SC 2026 oprawa: konsola rundy 5</title><style>
+:root { --zolty: #FEAC32; --krem: #FEFBF7; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; background: #000; color: var(--krem); font: 16px/1.5 "Noto Sans", sans-serif; }
+header, .ster { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 24px; }
+button { font: inherit; color: inherit; background: none; border: 1px solid rgba(254, 251, 247, .3); padding: 6px 12px; cursor: pointer; }
+button:hover { background: rgba(254, 251, 247, .3); }
+button[aria-pressed="true"] { background: var(--zolty); border-color: var(--zolty); color: #000; }
+#opis { margin: 0; padding: 0 24px 12px; max-width: 110ch; opacity: .75; }
+video { display: block; width: 100%; max-width: calc((100vh - 252px) * 16 / 9); margin: 0 auto; background: #000; }
+iframe { flex: 1; width: 100%; min-height: calc(100vh - 72px); border: 0; }
+[hidden] { display: none; }
+</style></head>
+<body><header><button type="button" data-kod="a4" data-film="filmy/a4-runda4.mp4" data-opis="Punkt odniesienia: A4 z rundy 4, bez zmian.">1. A4 Czytelnia (runda 4)</button><button type="button" data-kod="a5a" data-film="filmy/a5a.mp4" data-opis="A4 bliżej Hendersona: papier w kratkę z ziarnem, treść leży na osobnych kartkach z cieniem, burgundowe etykiety numerują i podpisują, żółta taśma trzyma kartki. Gęściej niż w A4: w zakończeniu kadr w ramce, lista i następna lekcja są na ekranie naraz. Pismo ręczne tylko raz, bardzo duże, na otwarciu.">2. A5a Zeszyt</button><button type="button" data-kod="a5b" data-film="filmy/a5b.mp4" data-opis="A4 z detalem typograficznym, jak w starannie złożonej książce: duża burgundowa cyfra lekcji, podwójne linie, które się rysują, listy z wiszącymi cyframi i cienkimi liniami między punktami, żółty znacznik na marginesie, który schodzi wiersz po wierszu razem z czytaniem. Bez pisma ręcznego.">3. A5b Druk</button><button type="button" data-kod="a5c" data-film="filmy/a5c.mp4" data-opis="A4, po którym jedzie wskaźnik: cienka granatowa linia z żółtą kropką na czele podkreśla tytuł pętelką, prowadzi od metody do metody i schodzi w dół listy, zapalając węzeł przy każdym punkcie. W ćwiczeniu kropka biegnie pod czytaną grupą wyrazów. Bez pisma ręcznego.">4. A5c Ślad</button><button type="button" data-kod="a2" data-ramka="fallback/kierunek-a-v2.html">5. A v2, wersja zapasowa</button><button type="button" data-kod="logo" data-ramka="logo/kierunki-v7/index.html">6. Logo: warianty v7</button></header>
+<section id="kino"><p id="opis"></p><video id="film" controls loop muted playsinline></video>
+<div class="ster"><button type="button" data-t="0">Otwarcie</button><button type="button" data-t="8.5">Belka</button><button type="button" data-t="16">Pojęcie</button><button type="button" data-t="27">Schemat</button><button type="button" data-t="41">Ćwiczenie</button><button type="button" data-t="55">Zamknięcie</button><button type="button" data-w="0">Pełny podgląd</button><button type="button" data-w="844">Telefon poziomo, 844 px</button><button type="button" data-w="390">Telefon pionowo, 390 px</button></div></section>
+<iframe id="ramka" title="Strona w ramce" allow="autoplay" hidden></iframe>
+<script>'use strict';
+
+// Konsola rundy 5: zakładka na kierunek (film) oraz zakładki z gotowymi stronami w ramce (wersja zapasowa, logo).
+// Filmy mają wspólną oś czasu: zmiana zakładki zostaje w tej samej sekundzie. Klawisze 1–6 przełączają zakładki.
+const film = document.getElementById('film');
+const kino = document.getElementById('kino');
+const ramka = document.getElementById('ramka');
+const opis = document.getElementById('opis');
+const zakladki = Array.from(document.querySelectorAll('header button'));
+const rozmiary = Array.from(document.querySelectorAll('button[data-w]'));
+
+function pokazFilm(zakladka) {
+  const sekunda = film.currentTime;
+  opis.textContent = zakladka.dataset.opis;
+  film.src = zakladka.dataset.film;
+  film.addEventListener('loadedmetadata', () => { film.currentTime = sekunda; }, { once: true });
+  film.play().catch((error) => console.warn('Film nie ruszył sam:', error.message));
+}
+
+function pokaz(zakladka) {
+  const jestFilm = zakladka.dataset.film !== undefined;
+  zakladki.forEach((inna) => inna.setAttribute('aria-pressed', String(inna === zakladka)));
+  kino.hidden = !jestFilm;
+  ramka.hidden = jestFilm;
+  if (jestFilm) {
+    pokazFilm(zakladka);
+  } else {
+    film.pause();
+    if (ramka.dataset.kod !== zakladka.dataset.kod) {
+      ramka.src = zakladka.dataset.ramka;
+      ramka.dataset.kod = zakladka.dataset.kod;
+    }
+  }
+  history.replaceState(null, '', `#${zakladka.dataset.kod}`);
+}
+
+function ustawSzerokosc(przycisk) {
+  const szerokosc = Number(przycisk.dataset.w);
+  film.style.maxWidth = szerokosc > 0 ? `${szerokosc}px` : '';
+  rozmiary.forEach((inny) => inny.setAttribute('aria-pressed', String(inny === przycisk)));
+}
+
+function handleZakladkaClick(event) {
+  pokaz(event.currentTarget);
+}
+
+function handleScenaClick(event) {
+  film.currentTime = Number(event.currentTarget.dataset.t);
+  film.play().catch((error) => console.warn('Film nie ruszył sam:', error.message));
+}
+
+function handleRozmiarClick(event) {
+  ustawSzerokosc(event.currentTarget);
+}
+
+function handleKeydown(event) {
+  const zakladka = zakladki[Number(event.key) - 1];
+  if (zakladka) pokaz(zakladka);
+}
+
+zakladki.forEach((zakladka) => zakladka.addEventListener('click', handleZakladkaClick));
+document.querySelectorAll('button[data-t]').forEach((przycisk) => przycisk.addEventListener('click', handleScenaClick));
+rozmiary.forEach((przycisk) => przycisk.addEventListener('click', handleRozmiarClick));
+document.addEventListener('keydown', handleKeydown);
+ustawSzerokosc(rozmiary[0]);
+pokaz(zakladki.find((zakladka) => zakladka.dataset.kod === location.hash.slice(1)) || zakladki[0]);
+</script></body></html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pl">
+<head><meta name="robots" content="noindex, nofollow"><style>@font-face { font-family: "Noto Serif"; src: url("../../fonts/NotoSerif.ttf"); font-weight: 100 900; }@font-face { font-family: "Noto Sans"; src: url("../../fonts/NotoSans-Regular.ttf"); font-weight: 400; }@font-face { font-family: "Noto Sans"; src: url("../../fonts/NotoSans-Bold.ttf"); font-weight: 700; }</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Logo SC Online: stykówka v6</title>
+  <link rel="stylesheet" href="stykowka.css">
+</head>
+<body>
+  <header class="naglowek">
+    <h1>Logo kursu Szybkie Czytanie Online: stykówka v6</h1>
+    <p>Sześć znaków do dalszej pracy, numeracja 1–6 (przy nazwie stary numer). Każdy ma 28 pól: 3 lekcje rozrusznika i 5 filarów po 5 lekcji. Kolory wzięte z kodu strony 5plus.edu.pl. Panel zmienia liczbę kolorów, układ kolorów na jasnym tle, układ na ciemnym tle i samo ciemne tło; układy są zapisane w kolejności jądro / krąg 2 / krąg 3. Małe rozmiary są rysowane bez podziału na lekcje.</p>
+    <ul class="paleta">
+      <li><span class="probka" style="background: var(--navy)"></span>granat #073462</li>
+      <li><span class="probka" style="background: var(--yellow)"></span>żółty #FEAC32</li>
+      <li><span class="probka" style="background: var(--wine)"></span>burgund #6A2142</li>
+      <li><span class="probka" style="background: var(--green)"></span>zieleń #124429</li>
+      <li><span class="probka" style="background: var(--plum)"></span>śliwka #451E3E</li>
+      <li><span class="probka" style="background: var(--cream)"></span>krem #FEFBF7</li>
+      <li><span class="probka" style="background: var(--pale)"></span>blady #DBE9F4</li>
+    </ul>
+  </header>
+
+  <form class="ster" id="ster">
+    <div class="ster-postep">
+      <label for="postep">Ukończone lekcje: <output id="licznik" for="postep">28 / 28</output></label>
+      <input type="range" id="postep" min="0" max="28" step="1" value="28">
+    </div>
+    <button type="button" id="odtworz">Odtwórz zapełnianie</button>
+    <fieldset class="ster-podzial">
+      <legend>Lekcje filaru w kręgu 2 i 3</legend>
+      <label><input type="radio" name="podzial" value="2" checked> 2 + 3</label>
+      <label><input type="radio" name="podzial" value="3"> 3 + 2</label>
+    </fieldset>
+    <fieldset class="ster-podzial">
+      <legend>Kolory</legend>
+      <label><input type="radio" name="kolory" value="k1"> 1</label>
+      <label><input type="radio" name="kolory" value="k2"> 2</label>
+      <label><input type="radio" name="kolory" value="k3" checked> 3</label>
+    </fieldset>
+    <label class="ster-uklad">Układ na jasnym tle <select id="uklad-jasny" name="uklad-jasny"></select></label>
+    <label class="ster-uklad">Układ na ciemnym tle <select id="uklad-ciemny" name="uklad-ciemny"></select></label>
+    <label class="ster-uklad">Ciemne tło <select id="tlo-ciemne" name="tlo-ciemne"></select></label>
+  </form>
+
+  <main id="kierunki"></main>
+
+  <script src="geometria.js"></script>
+  <script src="logo.js"></script>
+  <script src="wspolne.js"></script>
+  <script src="wersy-w-obrysie.js"></script>
+  <script src="oko-i-akapity.js"></script>
+  <script src="oko-z-wersami.js"></script>
+  <script src="oko-i-ksiega.js"></script>
+  <script src="ksiega-w-pedzie.js"></script>
+  <script src="sowa.js"></script>
+  <script src="stykowka.js"></script>
+</body>
+</html>

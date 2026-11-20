@@ -1,0 +1,237 @@
+<!doctype html><html lang="pl"><head><meta name="robots" content="noindex, nofollow"><style>@font-face { font-family: "Noto Serif"; src: url("../fonts/NotoSerif.ttf"); font-weight: 100 900; }@font-face { font-family: "Noto Sans"; src: url("../fonts/NotoSans-Regular.ttf"); font-weight: 400; }@font-face { font-family: "Noto Sans"; src: url("../fonts/NotoSans-Bold.ttf"); font-weight: 700; }</style><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SC 2026: kierunek A v2 w ruchu</title><style>/* Kierunek A „Czytelnia”, wersja 2: wygląd statyczny. Ruch w ruch.css. */
+:root { --granat: #073462; --zolty: #FEAC32; --burgund: #6A2142; --krem: #FEFBF7; --blady: #DBE9F4; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #1b1d22; color: #e9e6df; font: 15px/1.5 "Noto Sans", sans-serif; }
+main { max-width: 1640px; margin: 0 auto; padding: 24px 20px 64px; }
+h1.strona { font: 500 22px "Noto Serif", serif; margin: 0 0 4px; }
+.opis { color: #a4a4ad; margin: 0 0 16px; max-width: 110ch; }
+.ster { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 0; }
+.ster button { font: inherit; color: inherit; background: #2a2d35; border: 1px solid #3f434d; border-radius: 4px; padding: 6px 12px; cursor: pointer; }
+.ster button:hover { background: #343842; }
+.ster input[type="range"] { flex: 1 1 320px; accent-color: #FEAC32; }
+.ster output { font-variant-numeric: tabular-nums; min-width: 9ch; color: #a4a4ad; }
+
+.ekran { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #000; }
+.plan { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; transform: scale(var(--s, .5));
+  overflow: hidden; color: var(--krem); font-family: "Noto Sans", sans-serif; font-weight: 400; }
+.plan .warstwa { position: absolute; inset: 0; }
+.plan .szeryf { font-family: "Noto Serif", serif; font-weight: 400; letter-spacing: -0.012em; }
+.plan .maly { font-size: 28px; opacity: .72; }
+
+.ciemne { background-color: var(--granat);
+  background-image: radial-gradient(ellipse 70% 62% at 50% 44%, rgba(254,251,247,.08), rgba(254,251,247,0) 72%),
+    linear-gradient(rgba(254,251,247,.06) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(254,251,247,.06) 1.5px, transparent 1.5px);
+  background-size: auto, 80px 80px, 80px 80px; background-position: 0 0, 0 19px, -1px 0; }
+.wideo-box { transform-origin: 0 0; }
+.wideo-box video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cien-dol { background: linear-gradient(0deg, rgba(0,0,0,.5), rgba(0,0,0,0) 38%); }
+.cien-lewy { background: linear-gradient(90deg, rgba(0,0,0,.62), rgba(0,0,0,.3) 36%, rgba(0,0,0,0) 62%); }
+.postep { position: absolute; left: 0; top: 0; height: 4px; width: 25%; background: var(--zolty); }
+
+.znak svg { display: block; width: 100%; height: 100%; }
+.znak .s { color: var(--off); opacity: var(--off-o); }
+.znak .s.on { opacity: 1; }
+.znak .s.on.r1 { color: var(--z1); } .znak .s.on.r2 { color: var(--z2); } .znak .s.on.r3 { color: var(--z3); }
+.znak.ciemne { --z1: var(--zolty); --z2: var(--krem); --z3: var(--zolty); --off: var(--krem); --off-o: .18; }
+
+/* Otwarcie lekcji */
+.otw .marka { position: absolute; left: 140px; top: 116px; display: flex; align-items: center; gap: 22px; font-size: 26px; opacity: .85; }
+.otw .znak { width: 76px; height: 76px; }
+.otw .tytul { position: absolute; left: 134px; top: 392px; font-size: 176px; line-height: 1.1; }
+.tytul, .wiersz { display: inline-block; position: relative; white-space: nowrap; }
+.tytul .kursor { position: absolute; top: 16%; width: 4px; height: 70%; background: var(--zolty); }
+.otw .pod { position: absolute; left: 142px; top: 640px; display: flex; align-items: center; gap: 20px; font-size: 32px; }
+.otw .pod i { width: 40px; height: 1.5px; background: var(--krem); opacity: .5; }
+
+/* Belka */
+.belka { position: absolute; left: 140px; bottom: 124px; padding-left: 30px; }
+.belka .linia { position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; background: var(--zolty); transform-origin: 50% 100%; }
+.belka .imie { font-size: 54px; line-height: 1.2; }
+.belka .rola { font-size: 26px; opacity: .78; margin-top: 4px; }
+
+/* Pojęcie na kadrze */
+.pojecie { position: absolute; left: 134px; top: 520px; }
+.pojecie .wiersz { display: block; width: max-content; font-size: 124px; line-height: 1.12; }
+.pojecie p { margin: 30px 0 0 8px; font-size: 32px; line-height: 1.45; max-width: 760px; opacity: .86; }
+
+/* Kartka: kremowy papier w kratkę */
+.kartka { background-color: var(--krem); color: var(--granat);
+  background-image: linear-gradient(rgba(7,52,98,.065) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(7,52,98,.065) 1.5px, transparent 1.5px);
+  background-size: 80px 80px; background-position: 0 19px, -1px 0; box-shadow: 0 -30px 80px rgba(0,0,0,.35); }
+.kartka h2 { position: absolute; left: 140px; top: 116px; margin: 0; font-size: 64px; line-height: 1.15; }
+.karty { position: absolute; left: 140px; top: 300px; display: flex; gap: 40px; }
+.karta { width: 380px; height: 470px; padding: 44px; display: flex; flex-direction: column; background: var(--krem);
+  border: 1.5px solid rgba(7,52,98,.1); border-radius: 6px; box-shadow: 0 18px 50px rgba(7,52,98,.07); }
+.karta .metoda { width: 292px; height: 191px; overflow: visible; }
+.karta .wiersze rect { fill: rgba(7,52,98,.13); height: 4px; }
+.karta .slad { stroke: var(--granat); stroke-width: 3; stroke-dasharray: 1; }
+.karta .czubek { fill: var(--zolty); r: 7px; }
+.karta .nr { margin-top: auto; font-size: 24px; opacity: .55; }
+.karta .nazwa { font-size: 46px; line-height: 1.2; }
+
+.strona { position: absolute; left: 140px; top: 150px; width: 1060px; padding: 80px 96px 88px; background: var(--krem);
+  border: 1.5px solid rgba(7,52,98,.1); border-radius: 6px; box-shadow: 0 18px 50px rgba(7,52,98,.07);
+  font-family: "Noto Serif", serif; font-size: 40px; line-height: 1.85; }
+.strona .g { opacity: .28; background: linear-gradient(var(--zolty), var(--zolty)) no-repeat 0 100% / 0% 4px; }
+.bok { position: absolute; left: 1320px; top: 160px; width: 480px; }
+.bok .liczba { font-size: 220px; line-height: 1; }
+.bok .opis-tempa { display: flex; align-items: center; gap: 16px; margin-top: 8px; font-size: 28px; }
+.bok .takt { width: 14px; height: 14px; border-radius: 50%; background: var(--zolty); }
+.bok .wzor { margin-top: 72px; padding-top: 36px; border-top: 1.5px solid rgba(7,52,98,.14); font-size: 26px; opacity: .72; }
+.bok .wynik { margin-top: 10px; font-size: 50px; line-height: 1.2; white-space: nowrap; }
+
+/* Zamknięcie lekcji */
+.zam .rama { position: absolute; left: 140px; top: 190px; width: 720px; height: 405px; border: 1.5px solid rgba(254,251,247,.38); }
+.zam h2 { position: absolute; left: 980px; top: 176px; margin: 0; font-size: 64px; line-height: 1.15; }
+.zam ul { position: absolute; left: 980px; top: 304px; margin: 0; padding: 0; list-style: none; font-size: 34px; line-height: 1.35; }
+.zam li { position: relative; margin-bottom: 24px; padding-left: 52px; }
+.zam li::before { content: ""; position: absolute; left: 0; top: 23px; width: 28px; height: 2px; background: var(--zolty); }
+.zam .stan { position: absolute; left: 140px; top: 660px; display: flex; align-items: center; gap: 24px; }
+.zam .znak { width: 128px; height: 128px; }
+.zam .dalej { position: absolute; left: 980px; top: 664px; width: 800px; padding-top: 36px; border-top: 1.5px solid rgba(254,251,247,.16); }
+.zam .dalej b { display: block; margin-top: 6px; font-size: 48px; line-height: 1.2; }
+/* Kierunek A v2: ruch. Każda scena ma początek --t0, elementy wejście --we i wyjście --wy liczone od --t0.
+   Animacje są stale zatrzymane; czas ustawia ster.js (suwak, odtwarzanie, skoki do scen). */
+@keyframes wejdz { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes pojaw { from { opacity: 0; } to { opacity: 1; } }
+@keyframes wyjdz { to { opacity: 0; } }
+@keyframes wytrzyj { from { clip-path: inset(-10% 100% -25% 0); } to { clip-path: inset(-10% -4% -25% 0); } }
+@keyframes kursor { 0% { left: 0; opacity: 0; } 6% { left: 0; opacity: 1; } 88% { left: 100%; opacity: 1; } 100% { left: 100%; opacity: 0; } }
+@keyframes rosnij { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+/* kartka odjeżdża dalej niż wysokość kadru, żeby jej cień nie zostawał przy dolnej krawędzi */
+@keyframes kartka-gora { from { transform: translateY(calc(100% + 130px)); } to { transform: none; } }
+@keyframes kartka-dol { to { transform: translateY(calc(100% + 130px)); } }
+@keyframes rysuj { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes okno-male { to { transform: translate(140px, 190px) scale(.375); } }
+@keyframes okno-duze { from { transform: translate(140px, 190px) scale(.375); } to { transform: none; } }
+@keyframes czytaj { from { opacity: .28; } to { opacity: 1; } }
+@keyframes podkresl { 0% { background-size: 0% 4px; } 16% { background-size: 100% 4px; } 86% { background-size: 100% 4px; } 100% { background-size: 100% 0; } }
+@keyframes takt { 0% { transform: scale(1.9); opacity: 1; } 60% { transform: scale(1); opacity: .45; } 100% { transform: scale(1); opacity: .45; } }
+@keyframes pole { from { opacity: .18; } to { opacity: 1; } }
+@keyframes postep-rosnie { from { width: 21.43%; } to { width: 25%; } }
+@keyframes zegar { to { opacity: 1; } }
+
+/* Ustawienia ruchu nie dziedziczą się: element na kartce nie przejmuje sposobu wejścia kartki. */
+@property --jak { syntax: "*"; inherits: false; }
+@property --ile { syntax: "*"; inherits: false; }
+@property --jak-wy { syntax: "*"; inherits: false; }
+@property --ile-wy { syntax: "*"; inherits: false; }
+@property --we { syntax: "*"; inherits: false; }
+@property --wy { syntax: "*"; inherits: false; }
+
+.plan { --krzywa: cubic-bezier(.22, .8, .24, 1); animation: zegar 49.8s linear both; }
+
+/* wejście i wyjście */
+.r { animation: var(--jak, wejdz) var(--ile, .7s) var(--krzywa) calc(var(--t0) + var(--we)) both,
+     var(--jak-wy, wyjdz) var(--ile-wy, .45s) ease-in calc(var(--t0) + var(--wy)) forwards; }
+/* samo wejście: element wychodzi razem z kartką, na której leży */
+.we { animation: var(--jak, wejdz) var(--ile, .7s) var(--krzywa) calc(var(--t0) + var(--we)) both; }
+.kursor { animation: kursor var(--ile, 1.1s) var(--krzywa) calc(var(--t0) + var(--we)) both; }
+
+.wideo-box { animation: pojaw .9s ease 4.6s both, okno-male 1s var(--krzywa) 41.3s forwards,
+             okno-duze .9s var(--krzywa) 48.2s forwards, wyjdz .5s ease-in 49.2s forwards; }
+
+.karta .slad { animation: rysuj 1.8s ease-in-out calc(var(--t0) + var(--we)) both; }
+
+.strona .g.czytana { animation: czytaj .25s linear calc(var(--t0) + 2.2s + var(--i) * 1.3333s) both,
+                               podkresl 1.3333s linear calc(var(--t0) + 2.2s + var(--i) * 1.3333s) both; }
+.bok .takt { animation: takt 1.3333s ease-out calc(var(--t0) + 2.2s) 6 both; }
+
+.zam .znak .s[data-i="6"] { animation: pole .8s ease calc(var(--t0) + 3.4s) both; }
+.zam .postep { animation: pojaw .6s ease calc(var(--t0) + 1s) both, postep-rosnie .8s var(--krzywa) calc(var(--t0) + 3.4s) both,
+               wyjdz .45s ease-in calc(var(--t0) + 7s) forwards; }
+</style></head><body><main>
+<h1 class="strona">Szybkie Czytanie Online 2026: kierunek A „Czytelnia”, wersja 2 w ruchu</h1>
+<p class="opis">Sześć scen na jednej osi czasu: otwarcie lekcji, belka, pojęcie na kadrze, schemat, ćwiczenie z tempem, zamknięcie.
+Przycisk z nazwą skacze na początek sceny, znaczek obok zatrzymuje na gotowej klatce. Kadr Piotrka to fragment filmu z kanału jako podkład zastępczy.</p>
+<div class="ekran"><div class="plan">
+<div class="warstwa ciemne"></div>
+<div class="warstwa wideo-box"><video src="media/kadr.mp4" poster="media/kadr.jpg" muted loop playsinline preload="auto"></video></div>
+<div class="warstwa otw" style="--t0:0s"><div class="postep r" style="--we:0.2s;--wy:4.3s;--jak:pojaw"></div><div class="marka r" style="--we:0.3s;--wy:4.2s"><div class="znak ciemne"><svg viewBox="-100 -100 200 200" role="img" aria-label="Oko i księga, ukończone lekcje: 7 z 28"><defs><clipPath id="logo3v"><path d="M-48.3,-14.96L-38.64,-10.87L-28.98,-5.7L-19.32,0.53L-9.66,7.83L0,16.2L9.66,7.83L19.32,0.53L28.98,-5.7L38.64,-10.87L48.3,-14.96L48.3,-42L-48.3,-42Z"/></clipPath><mask id="logo3m" maskUnits="userSpaceOnUse" x="-100" y="-100" width="200" height="200"><rect x="-100" y="-100" width="200" height="200" fill="#fff"/><circle cx="8.7" cy="-22.6" r="9.5" fill="#000"/></mask></defs><g class="s r1 on" data-i="0"><circle cx="8.7" cy="-22.6" r="7" fill="currentColor"/></g><g class="s r1 on" data-i="1"><g clip-path="url(#logo3v)" mask="url(#logo3m)"><path d="M-16,-12.4a16,16 0 1 0 32,0a16,16 0 1 0 -32,0Z" fill="currentColor" fill-rule="evenodd"/></g></g><g class="s r1 on" data-i="2"><g clip-path="url(#logo3v)" mask="url(#logo3m)"><path d="M-29.6,-12.4a29.6,29.6 0 1 0 59.2,0a29.6,29.6 0 1 0 -59.2,0ZM-18.5,-12.4a18.5,18.5 0 1 0 37,0a18.5,18.5 0 1 0 -37,0Z" fill="currentColor" fill-rule="evenodd"/></g></g><g class="s r2 on" data-i="3"><g transform="translate(0,24.4)"><path d="M-70.37,-40.91A81.4,81.4 0 0 1 -61.34,-53.51" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2 on" data-i="4"><g transform="translate(0,24.4)"><path d="M-60.55,-54.41A81.4,81.4 0 0 1 -49.14,-64.89" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2 on" data-i="5"><g transform="translate(0,24.4)"><path d="M-47.37,-66.2A81.4,81.4 0 0 1 -33.97,-73.97" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2 on" data-i="6"><g transform="translate(0,24.4)"><path d="M-32.87,-74.47A81.4,81.4 0 0 1 -18.16,-79.35" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="7"><g transform="translate(0,24.4)"><path d="M-16.01,-79.81A81.4,81.4 0 0 1 -0.6,-81.4" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="8"><g transform="translate(0,24.4)"><path d="M0.6,-81.4A81.4,81.4 0 0 1 16.01,-79.81" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="9"><g transform="translate(0,24.4)"><path d="M18.16,-79.35A81.4,81.4 0 0 1 32.87,-74.47" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="10"><g transform="translate(0,24.4)"><path d="M33.97,-73.97A81.4,81.4 0 0 1 47.37,-66.2" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="11"><g transform="translate(0,24.4)"><path d="M49.14,-64.89A81.4,81.4 0 0 1 60.55,-54.41" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="12"><g transform="translate(0,24.4)"><path d="M61.34,-53.51A81.4,81.4 0 0 1 70.37,-40.91" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r3" data-i="13"><path d="M-80.5,-10.9L-77.36,-10.84L-74.22,-10.67L-71.08,-10.39L-67.94,-10L-64.8,-9.49L-61.66,-8.87L-58.52,-8.13L-55.38,-7.29L-52.24,-6.33L-49.1,-5.26L-51.84,5.93L-55.16,4.81L-58.48,3.8L-61.79,2.91L-65.11,2.14L-68.42,1.48L-71.74,0.95L-75.05,0.53L-78.37,0.24L-81.68,0.06L-85,0Z" fill="currentColor"/></g><g class="s r3" data-i="14"><path d="M-88.7,8.1L-85.23,8.15L-81.76,8.32L-78.3,8.59L-74.83,8.98L-71.36,9.47L-67.89,10.08L-64.42,10.79L-60.96,11.61L-57.49,12.55L-54.02,13.59L-54.02,23.51L-57.49,22.65L-60.96,21.89L-64.42,21.21L-67.89,20.62L-71.36,20.13L-74.83,19.72L-78.3,19.41L-81.76,19.18L-85.23,19.05L-88.7,19Z" fill="currentColor"/></g><g class="s r3" data-i="15"><path d="M-95,27.1L-91.28,27.14L-87.56,27.26L-83.84,27.46L-80.12,27.75L-76.4,28.11L-72.68,28.56L-68.96,29.08L-65.24,29.69L-61.52,30.38L-57.8,31.15L-57.8,41.41L-61.52,40.67L-65.24,40L-68.96,39.42L-72.68,38.91L-76.4,38.48L-80.12,38.13L-83.84,37.85L-87.56,37.66L-91.28,37.54L-95,37.5Z" fill="currentColor"/></g><g class="s r3" data-i="16"><path d="M-47.5,-4.67L-44.44,-3.46L-41.38,-2.14L-38.32,-0.71L-35.26,0.82L-32.2,2.46L-29.14,4.2L-26.08,6.06L-23.02,8.02L-19.96,10.08L-16.9,12.26L-17.84,24.34L-21.08,22.06L-24.31,19.88L-27.54,17.82L-30.77,15.88L-34,14.04L-37.23,12.32L-40.46,10.71L-43.69,9.21L-46.92,7.83L-50.16,6.55Z" fill="currentColor"/></g><g class="s r3" data-i="17"><path d="M-52.42,14.11L-49.03,15.28L-45.64,16.56L-42.26,17.94L-38.87,19.43L-35.48,21.02L-32.09,22.72L-28.7,24.52L-25.32,26.43L-21.93,28.44L-18.54,30.56L-18.54,37.46L-21.93,35.72L-25.32,34.06L-28.7,32.5L-32.09,31.02L-35.48,29.62L-38.87,28.31L-42.26,27.09L-45.64,25.95L-49.03,24.9L-52.42,23.94Z" fill="currentColor"/></g><g class="s r3" data-i="18"><path d="M-56.2,31.5L-52.56,32.37L-48.92,33.31L-45.28,34.33L-41.64,35.43L-38,36.6L-34.36,37.86L-30.72,39.19L-27.08,40.59L-23.44,42.08L-19.8,43.64L-19.8,53.48L-23.44,51.97L-27.08,50.53L-30.72,49.17L-34.36,47.89L-38,46.68L-41.64,45.54L-45.28,44.48L-48.92,43.5L-52.56,42.59L-56.2,41.75Z" fill="currentColor"/></g><g class="s r3" data-i="19"><path d="M-15.3,13.44L-12.24,15.78L-9.18,18.22L-6.12,20.77L-3.06,23.43L0,26.2L3.06,23.43L6.12,20.77L9.18,18.22L12.24,15.78L15.3,13.44L16.16,25.58L12.92,28.04L9.69,30.61L6.46,33.3L3.23,36.09L0,39L-3.23,36.09L-6.46,33.3L-9.69,30.61L-12.92,28.04L-16.16,25.58Z" fill="currentColor"/></g><g class="s r3" data-i="20"><path d="M-16.94,31.6L-13.55,33.87L-10.16,36.24L-6.78,38.72L-3.39,41.31L0,44L3.39,41.31L6.78,38.72L10.16,36.24L13.55,33.87L16.94,31.6L16.94,38.31L13.55,40.17L10.16,42.13L6.78,44.17L3.39,46.29L0,48.5L-3.39,46.29L-6.78,44.17L-10.16,42.13L-13.55,40.17L-16.94,38.31Z" fill="currentColor"/></g><g class="s r3" data-i="21"><path d="M-18.2,44.35L-14.56,46.03L-10.92,47.78L-7.28,49.61L-3.64,51.52L0,53.5L3.64,51.52L7.28,49.61L10.92,47.78L14.56,46.03L18.2,44.35L18.2,54.17L14.56,55.78L10.92,57.47L7.28,59.24L3.64,61.08L0,63L-3.64,61.08L-7.28,59.24L-10.92,57.47L-14.56,55.78L-18.2,54.17Z" fill="currentColor"/></g><g class="s r3" data-i="22"><path d="M16.9,12.26L19.96,10.08L23.02,8.02L26.08,6.06L29.14,4.2L32.2,2.46L35.26,0.82L38.32,-0.71L41.38,-2.14L44.44,-3.46L47.5,-4.67L50.16,6.55L46.92,7.83L43.69,9.21L40.46,10.71L37.23,12.32L34,14.04L30.77,15.88L27.54,17.82L24.31,19.88L21.08,22.06L17.84,24.34Z" fill="currentColor"/></g><g class="s r3" data-i="23"><path d="M18.54,30.56L21.93,28.44L25.32,26.43L28.7,24.52L32.09,22.72L35.48,21.02L38.87,19.43L42.26,17.94L45.64,16.56L49.03,15.28L52.42,14.11L52.42,23.94L49.03,24.9L45.64,25.95L42.26,27.09L38.87,28.31L35.48,29.62L32.09,31.02L28.7,32.5L25.32,34.06L21.93,35.72L18.54,37.46Z" fill="currentColor"/></g><g class="s r3" data-i="24"><path d="M19.8,43.64L23.44,42.08L27.08,40.59L30.72,39.19L34.36,37.86L38,36.6L41.64,35.43L45.28,34.33L48.92,33.31L52.56,32.37L56.2,31.5L56.2,41.75L52.56,42.59L48.92,43.5L45.28,44.48L41.64,45.54L38,46.68L34.36,47.89L30.72,49.17L27.08,50.53L23.44,51.97L19.8,53.48Z" fill="currentColor"/></g><g class="s r3" data-i="25"><path d="M49.1,-5.26L52.24,-6.33L55.38,-7.29L58.52,-8.13L61.66,-8.87L64.8,-9.49L67.94,-10L71.08,-10.39L74.22,-10.67L77.36,-10.84L80.5,-10.9L85,0L81.68,0.06L78.37,0.24L75.05,0.53L71.74,0.95L68.42,1.48L65.11,2.14L61.79,2.91L58.48,3.8L55.16,4.81L51.84,5.93Z" fill="currentColor"/></g><g class="s r3" data-i="26"><path d="M54.02,13.59L57.49,12.55L60.96,11.61L64.42,10.79L67.89,10.08L71.36,9.47L74.83,8.98L78.3,8.59L81.76,8.32L85.23,8.15L88.7,8.1L88.7,19L85.23,19.05L81.76,19.18L78.3,19.41L74.83,19.72L71.36,20.13L67.89,20.62L64.42,21.21L60.96,21.89L57.49,22.65L54.02,23.51Z" fill="currentColor"/></g><g class="s r3" data-i="27"><path d="M57.8,31.15L61.52,30.38L65.24,29.69L68.96,29.08L72.68,28.56L76.4,28.11L80.12,27.75L83.84,27.46L87.56,27.26L91.28,27.14L95,27.1L95,37.5L91.28,37.54L87.56,37.66L83.84,37.85L80.12,38.13L76.4,38.48L72.68,38.91L68.96,39.42L65.24,40L61.52,40.67L57.8,41.41Z" fill="currentColor"/></g></svg></div><span>Szybkie Czytanie Online</span></div><div class="tytul szeryf"><span class="r" style="--we:0.9s;--wy:5.3s;--jak:wytrzyj;--ile:1.1s">Wskaźnik</span><i class="kursor" style="--we:0.85s;--wy:999s;--ile:1.25s"></i></div><div class="pod r" style="--we:2.0s;--wy:4.2s"><span>Lekcja 7</span><i></i><span>Rozszerzanie pola widzenia</span></div></div><div class="warstwa " style="--t0:6s"><div class="warstwa cien-dol r" style="--we:0.2s;--wy:4.6s;--jak:pojaw"></div><div class="belka"><i class="linia r" style="--we:0.4s;--wy:4.4s;--jak:rosnij;--ile:0.5s"></i><div class="imie szeryf r" style="--we:0.6s;--wy:4.3s;--jak:wytrzyj;--ile:0.8s">Piotr Starzyński</div><div class="rola r" style="--we:1.0s;--wy:4.2s">autor kursu</div></div></div><div class="warstwa " style="--t0:11.5s"><div class="warstwa cien-lewy r" style="--we:0.2s;--wy:6.2s;--jak:pojaw;--ile:0.8s"></div><div class="pojecie"><span class="wiersz szeryf r" style="--we:0.6s;--wy:5.8s;--jak:wytrzyj;--ile:0.9s">Czytanie</span><span class="wiersz szeryf r" style="--we:0.85s;--wy:5.8s;--jak:wytrzyj;--ile:0.9s">poglądowe</span><p class="r" style="--we:1.7s;--wy:5.7s">Łapiesz słowa po kształcie, nie sylaba po sylabie.</p></div></div><div class="warstwa " style="--t0:18.5s"><div class="warstwa kartka r" style="--we:0.3s;--wy:10.0s;--jak:kartka-gora;--ile:0.9s;--jak-wy:kartka-dol;--ile-wy:0.7s"><div class="postep"></div><h2 class="szeryf we" style="--we:1.0s;--wy:999s">Cztery metody prowadzenia wzroku</h2><div class="karty"><div class="karta we" style="--we:1.4s;--wy:999s"><svg class="metoda" viewBox="0 0 300 196"><g class="wiersze"><rect x="20" y="19" width="260" height="6" rx="3"/><rect x="20" y="49" width="260" height="6" rx="3"/><rect x="20" y="79" width="260" height="6" rx="3"/><rect x="20" y="109" width="260" height="6" rx="3"/><rect x="20" y="139" width="260" height="6" rx="3"/><rect x="20" y="169" width="200" height="6" rx="3"/></g><path class="slad" style="--we:2.3s" d="M28.0,31.0L272.0,31.0L272.0,61.0L28.0,61.0L28.0,91.0L272.0,91.0L272.0,121.0L28.0,121.0L28.0,151.0L272.0,151.0" pathLength="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle class="czubek we" style="--we:4.0s;--wy:999s;--jak:pojaw;--ile:0.3s" cx="272.0" cy="151.0" r="8"/></svg><div class="nr">Metoda 1</div><div class="nazwa szeryf">Od tyłu</div></div><div class="karta we" style="--we:1.54s;--wy:999s"><svg class="metoda" viewBox="0 0 300 196"><g class="wiersze"><rect x="20" y="19" width="260" height="6" rx="3"/><rect x="20" y="49" width="260" height="6" rx="3"/><rect x="20" y="79" width="260" height="6" rx="3"/><rect x="20" y="109" width="260" height="6" rx="3"/><rect x="20" y="139" width="260" height="6" rx="3"/><rect x="20" y="169" width="200" height="6" rx="3"/></g><path class="slad" style="--we:2.75s" d="M28.0,22.0L272.0,86.0L28.0,94.0L272.0,158.0L28.0,166.0" pathLength="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle class="czubek we" style="--we:4.45s;--wy:999s;--jak:pojaw;--ile:0.3s" cx="28.0" cy="166.0" r="8"/></svg><div class="nr">Metoda 2</div><div class="nazwa szeryf">Choinki</div></div><div class="karta we" style="--we:1.68s;--wy:999s"><svg class="metoda" viewBox="0 0 300 196"><g class="wiersze"><rect x="20" y="19" width="260" height="6" rx="3"/><rect x="20" y="49" width="260" height="6" rx="3"/><rect x="20" y="79" width="260" height="6" rx="3"/><rect x="20" y="109" width="260" height="6" rx="3"/><rect x="20" y="139" width="260" height="6" rx="3"/><rect x="20" y="169" width="200" height="6" rx="3"/></g><path class="slad" style="--we:3.1999999999999997s" d="M28.0,22.0L37.3,28.2L63.7,34.5L103.3,40.8L150.0,47.0L196.7,53.2L236.3,59.5L262.7,65.8L272.0,72.0L262.7,78.2L236.3,84.5L196.7,90.8L150.0,97.0L103.3,103.2L63.7,109.5L37.3,115.8L28.0,122.0L37.3,128.2L63.7,134.5L103.3,140.8L150.0,147.0L196.7,153.2L236.3,159.5L262.7,165.8L272.0,172.0" pathLength="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle class="czubek we" style="--we:4.9s;--wy:999s;--jak:pojaw;--ile:0.3s" cx="272.0" cy="172.0" r="8"/></svg><div class="nr">Metoda 3</div><div class="nazwa szeryf">Wąż</div></div><div class="karta we" style="--we:1.8199999999999998s;--wy:999s"><svg class="metoda" viewBox="0 0 300 196"><g class="wiersze"><rect x="20" y="19" width="260" height="6" rx="3"/><rect x="20" y="49" width="260" height="6" rx="3"/><rect x="20" y="79" width="260" height="6" rx="3"/><rect x="20" y="109" width="260" height="6" rx="3"/><rect x="20" y="139" width="260" height="6" rx="3"/><rect x="20" y="169" width="200" height="6" rx="3"/></g><path class="slad" style="--we:3.65s" d="M28.0,22.0L29.0,24.1L32.2,26.2L37.3,28.2L44.3,30.3L53.2,32.4L63.7,34.5L75.7,36.6L89.0,38.7L103.3,40.8L118.4,42.8L134.1,44.9L150.0,47.0L165.9,49.1L181.6,51.2L196.7,53.2L211.0,55.3L224.3,57.4L236.3,59.5L246.8,61.6L255.7,63.7L262.7,65.8L267.8,67.8L271.0,69.9L272.0,72.0a11,11 0 1 1 22,0a11,11 0 1 1 -22,0L272.0,72.0L271.0,74.1L267.8,76.2L262.7,78.2L255.7,80.3L246.8,82.4L236.3,84.5L224.3,86.6L211.0,88.7L196.7,90.8L181.6,92.8L165.9,94.9L150.0,97.0L134.1,99.1L118.4,101.2L103.3,103.2L89.0,105.3L75.7,107.4L63.7,109.5L53.2,111.6L44.3,113.7L37.3,115.8L32.2,117.8L29.0,119.9L28.0,122.0a11,11 0 1 0 -22,0a11,11 0 1 0 22,0L28.0,122.0L29.0,124.1L32.2,126.2L37.3,128.2L44.3,130.3L53.2,132.4L63.7,134.5L75.7,136.6L89.0,138.7L103.3,140.8L118.4,142.8L134.1,144.9L150.0,147.0L165.9,149.1L181.6,151.2L196.7,153.2L211.0,155.3L224.3,157.4L236.3,159.5L246.8,161.6L255.7,163.7L262.7,165.8L267.8,167.8L271.0,169.9L272.0,172.0" pathLength="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle class="czubek we" style="--we:5.35s;--wy:999s;--jak:pojaw;--ile:0.3s" cx="272.0" cy="172.0" r="8"/></svg><div class="nr">Metoda 4</div><div class="nazwa szeryf">Pętelki</div></div></div></div></div><div class="warstwa " style="--t0:29.5s"><div class="warstwa kartka r" style="--we:0.3s;--wy:10.6s;--jak:kartka-gora;--ile:0.9s;--jak-wy:kartka-dol;--ile-wy:0.7s"><div class="postep"></div><div class="strona we" style="--we:0.9s;--wy:999s"><span class="g czytana" style="--i:0">W początkach roku 1879,</span> <span class="g czytana" style="--i:1">kiedy cały świat</span> <span class="g czytana" style="--i:2">interesował się zawarciem</span> <span class="g czytana" style="--i:3">pokoju san-stefańskiego,</span> <span class="g czytana" style="--i:4">wyborem nowego papieża</span> <span class="g czytana" style="--i:5">albo szansami</span> <span class="g">europejskiej wojny,</span> <span class="g">warszawscy kupcy</span> <span class="g">tudzież inteligencja</span> <span class="g">pewnej okolicy</span> <span class="g">Krakowskiego Przedmieścia</span> <span class="g">nie mniej gorąco</span> <span class="g">interesowała się przyszłością</span> <span class="g">galanteryjnego sklepu</span> <span class="g">pod firmą J. Mincel i S. Wokulski.</span></div><div class="bok"><div class="liczba szeryf we" style="--we:1.2s;--wy:999s">45</div><div class="opis-tempa we" style="--we:1.4s;--wy:999s"><i class="takt"></i><span>uderzeń na minutę</span></div><div class="wzor we" style="--we:1.7s;--wy:999s">11 słów × 2 linijki × 45 uderzeń</div><div class="wynik szeryf we" style="--we:1.9s;--wy:999s">990 słów na minutę</div></div></div></div><div class="warstwa zam" style="--t0:41s"><div class="postep"></div><div class="rama r" style="--we:1.2s;--wy:7.0s;--jak:pojaw"></div><h2 class="szeryf r" style="--we:1.3s;--wy:6.9s">W tej lekcji</h2><ul><li class="r" style="--we:1.8s;--wy:6.9s">Wskaźnik nie zasłania tekstu</li><li class="r" style="--we:2.3s;--wy:6.9s">Skupia wzrok w jednym punkcie</li><li class="r" style="--we:2.8s;--wy:6.9s">Ułatwia dyscyplinę oka</li></ul><div class="stan r" style="--we:1.6s;--wy:6.9s"><div class="znak ciemne"><svg viewBox="-100 -100 200 200" role="img" aria-label="Oko i księga, ukończone lekcje: 7 z 28"><defs><clipPath id="logo3v"><path d="M-48.3,-14.96L-38.64,-10.87L-28.98,-5.7L-19.32,0.53L-9.66,7.83L0,16.2L9.66,7.83L19.32,0.53L28.98,-5.7L38.64,-10.87L48.3,-14.96L48.3,-42L-48.3,-42Z"/></clipPath><mask id="logo3m" maskUnits="userSpaceOnUse" x="-100" y="-100" width="200" height="200"><rect x="-100" y="-100" width="200" height="200" fill="#fff"/><circle cx="8.7" cy="-22.6" r="9.5" fill="#000"/></mask></defs><g class="s r1 on" data-i="0"><circle cx="8.7" cy="-22.6" r="7" fill="currentColor"/></g><g class="s r1 on" data-i="1"><g clip-path="url(#logo3v)" mask="url(#logo3m)"><path d="M-16,-12.4a16,16 0 1 0 32,0a16,16 0 1 0 -32,0Z" fill="currentColor" fill-rule="evenodd"/></g></g><g class="s r1 on" data-i="2"><g clip-path="url(#logo3v)" mask="url(#logo3m)"><path d="M-29.6,-12.4a29.6,29.6 0 1 0 59.2,0a29.6,29.6 0 1 0 -59.2,0ZM-18.5,-12.4a18.5,18.5 0 1 0 37,0a18.5,18.5 0 1 0 -37,0Z" fill="currentColor" fill-rule="evenodd"/></g></g><g class="s r2 on" data-i="3"><g transform="translate(0,24.4)"><path d="M-70.37,-40.91A81.4,81.4 0 0 1 -61.34,-53.51" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2 on" data-i="4"><g transform="translate(0,24.4)"><path d="M-60.55,-54.41A81.4,81.4 0 0 1 -49.14,-64.89" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2 on" data-i="5"><g transform="translate(0,24.4)"><path d="M-47.37,-66.2A81.4,81.4 0 0 1 -33.97,-73.97" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2 on" data-i="6"><g transform="translate(0,24.4)"><path d="M-32.87,-74.47A81.4,81.4 0 0 1 -18.16,-79.35" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="7"><g transform="translate(0,24.4)"><path d="M-16.01,-79.81A81.4,81.4 0 0 1 -0.6,-81.4" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="8"><g transform="translate(0,24.4)"><path d="M0.6,-81.4A81.4,81.4 0 0 1 16.01,-79.81" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="9"><g transform="translate(0,24.4)"><path d="M18.16,-79.35A81.4,81.4 0 0 1 32.87,-74.47" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="10"><g transform="translate(0,24.4)"><path d="M33.97,-73.97A81.4,81.4 0 0 1 47.37,-66.2" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="11"><g transform="translate(0,24.4)"><path d="M49.14,-64.89A81.4,81.4 0 0 1 60.55,-54.41" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r2" data-i="12"><g transform="translate(0,24.4)"><path d="M61.34,-53.51A81.4,81.4 0 0 1 70.37,-40.91" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt"/></g></g><g class="s r3" data-i="13"><path d="M-80.5,-10.9L-77.36,-10.84L-74.22,-10.67L-71.08,-10.39L-67.94,-10L-64.8,-9.49L-61.66,-8.87L-58.52,-8.13L-55.38,-7.29L-52.24,-6.33L-49.1,-5.26L-51.84,5.93L-55.16,4.81L-58.48,3.8L-61.79,2.91L-65.11,2.14L-68.42,1.48L-71.74,0.95L-75.05,0.53L-78.37,0.24L-81.68,0.06L-85,0Z" fill="currentColor"/></g><g class="s r3" data-i="14"><path d="M-88.7,8.1L-85.23,8.15L-81.76,8.32L-78.3,8.59L-74.83,8.98L-71.36,9.47L-67.89,10.08L-64.42,10.79L-60.96,11.61L-57.49,12.55L-54.02,13.59L-54.02,23.51L-57.49,22.65L-60.96,21.89L-64.42,21.21L-67.89,20.62L-71.36,20.13L-74.83,19.72L-78.3,19.41L-81.76,19.18L-85.23,19.05L-88.7,19Z" fill="currentColor"/></g><g class="s r3" data-i="15"><path d="M-95,27.1L-91.28,27.14L-87.56,27.26L-83.84,27.46L-80.12,27.75L-76.4,28.11L-72.68,28.56L-68.96,29.08L-65.24,29.69L-61.52,30.38L-57.8,31.15L-57.8,41.41L-61.52,40.67L-65.24,40L-68.96,39.42L-72.68,38.91L-76.4,38.48L-80.12,38.13L-83.84,37.85L-87.56,37.66L-91.28,37.54L-95,37.5Z" fill="currentColor"/></g><g class="s r3" data-i="16"><path d="M-47.5,-4.67L-44.44,-3.46L-41.38,-2.14L-38.32,-0.71L-35.26,0.82L-32.2,2.46L-29.14,4.2L-26.08,6.06L-23.02,8.02L-19.96,10.08L-16.9,12.26L-17.84,24.34L-21.08,22.06L-24.31,19.88L-27.54,17.82L-30.77,15.88L-34,14.04L-37.23,12.32L-40.46,10.71L-43.69,9.21L-46.92,7.83L-50.16,6.55Z" fill="currentColor"/></g><g class="s r3" data-i="17"><path d="M-52.42,14.11L-49.03,15.28L-45.64,16.56L-42.26,17.94L-38.87,19.43L-35.48,21.02L-32.09,22.72L-28.7,24.52L-25.32,26.43L-21.93,28.44L-18.54,30.56L-18.54,37.46L-21.93,35.72L-25.32,34.06L-28.7,32.5L-32.09,31.02L-35.48,29.62L-38.87,28.31L-42.26,27.09L-45.64,25.95L-49.03,24.9L-52.42,23.94Z" fill="currentColor"/></g><g class="s r3" data-i="18"><path d="M-56.2,31.5L-52.56,32.37L-48.92,33.31L-45.28,34.33L-41.64,35.43L-38,36.6L-34.36,37.86L-30.72,39.19L-27.08,40.59L-23.44,42.08L-19.8,43.64L-19.8,53.48L-23.44,51.97L-27.08,50.53L-30.72,49.17L-34.36,47.89L-38,46.68L-41.64,45.54L-45.28,44.48L-48.92,43.5L-52.56,42.59L-56.2,41.75Z" fill="currentColor"/></g><g class="s r3" data-i="19"><path d="M-15.3,13.44L-12.24,15.78L-9.18,18.22L-6.12,20.77L-3.06,23.43L0,26.2L3.06,23.43L6.12,20.77L9.18,18.22L12.24,15.78L15.3,13.44L16.16,25.58L12.92,28.04L9.69,30.61L6.46,33.3L3.23,36.09L0,39L-3.23,36.09L-6.46,33.3L-9.69,30.61L-12.92,28.04L-16.16,25.58Z" fill="currentColor"/></g><g class="s r3" data-i="20"><path d="M-16.94,31.6L-13.55,33.87L-10.16,36.24L-6.78,38.72L-3.39,41.31L0,44L3.39,41.31L6.78,38.72L10.16,36.24L13.55,33.87L16.94,31.6L16.94,38.31L13.55,40.17L10.16,42.13L6.78,44.17L3.39,46.29L0,48.5L-3.39,46.29L-6.78,44.17L-10.16,42.13L-13.55,40.17L-16.94,38.31Z" fill="currentColor"/></g><g class="s r3" data-i="21"><path d="M-18.2,44.35L-14.56,46.03L-10.92,47.78L-7.28,49.61L-3.64,51.52L0,53.5L3.64,51.52L7.28,49.61L10.92,47.78L14.56,46.03L18.2,44.35L18.2,54.17L14.56,55.78L10.92,57.47L7.28,59.24L3.64,61.08L0,63L-3.64,61.08L-7.28,59.24L-10.92,57.47L-14.56,55.78L-18.2,54.17Z" fill="currentColor"/></g><g class="s r3" data-i="22"><path d="M16.9,12.26L19.96,10.08L23.02,8.02L26.08,6.06L29.14,4.2L32.2,2.46L35.26,0.82L38.32,-0.71L41.38,-2.14L44.44,-3.46L47.5,-4.67L50.16,6.55L46.92,7.83L43.69,9.21L40.46,10.71L37.23,12.32L34,14.04L30.77,15.88L27.54,17.82L24.31,19.88L21.08,22.06L17.84,24.34Z" fill="currentColor"/></g><g class="s r3" data-i="23"><path d="M18.54,30.56L21.93,28.44L25.32,26.43L28.7,24.52L32.09,22.72L35.48,21.02L38.87,19.43L42.26,17.94L45.64,16.56L49.03,15.28L52.42,14.11L52.42,23.94L49.03,24.9L45.64,25.95L42.26,27.09L38.87,28.31L35.48,29.62L32.09,31.02L28.7,32.5L25.32,34.06L21.93,35.72L18.54,37.46Z" fill="currentColor"/></g><g class="s r3" data-i="24"><path d="M19.8,43.64L23.44,42.08L27.08,40.59L30.72,39.19L34.36,37.86L38,36.6L41.64,35.43L45.28,34.33L48.92,33.31L52.56,32.37L56.2,31.5L56.2,41.75L52.56,42.59L48.92,43.5L45.28,44.48L41.64,45.54L38,46.68L34.36,47.89L30.72,49.17L27.08,50.53L23.44,51.97L19.8,53.48Z" fill="currentColor"/></g><g class="s r3" data-i="25"><path d="M49.1,-5.26L52.24,-6.33L55.38,-7.29L58.52,-8.13L61.66,-8.87L64.8,-9.49L67.94,-10L71.08,-10.39L74.22,-10.67L77.36,-10.84L80.5,-10.9L85,0L81.68,0.06L78.37,0.24L75.05,0.53L71.74,0.95L68.42,1.48L65.11,2.14L61.79,2.91L58.48,3.8L55.16,4.81L51.84,5.93Z" fill="currentColor"/></g><g class="s r3" data-i="26"><path d="M54.02,13.59L57.49,12.55L60.96,11.61L64.42,10.79L67.89,10.08L71.36,9.47L74.83,8.98L78.3,8.59L81.76,8.32L85.23,8.15L88.7,8.1L88.7,19L85.23,19.05L81.76,19.18L78.3,19.41L74.83,19.72L71.36,20.13L67.89,20.62L64.42,21.21L60.96,21.89L57.49,22.65L54.02,23.51Z" fill="currentColor"/></g><g class="s r3" data-i="27"><path d="M57.8,31.15L61.52,30.38L65.24,29.69L68.96,29.08L72.68,28.56L76.4,28.11L80.12,27.75L83.84,27.46L87.56,27.26L91.28,27.14L95,27.1L95,37.5L91.28,37.54L87.56,37.66L83.84,37.85L80.12,38.13L76.4,38.48L72.68,38.91L68.96,39.42L65.24,40L61.52,40.67L57.8,41.41Z" fill="currentColor"/></g></svg></div><span class="maly">Lekcja 7 z 28</span></div><div class="dalej r" style="--we:4.0s;--wy:6.9s"><span class="maly">Następna lekcja</span><b class="szeryf">08 · Łapanie grup wyrazów</b></div></div>
+</div></div>
+<div class="ster"><button type="button" id="graj">Pauza</button><input type="range" id="suwak" min="0" step="0.05" value="0">
+<output id="licznik"></output><button type="button" data-t="0">Otwarcie</button><button type="button" data-t="3.4" data-stop="1" title="Zatrzymaj na klatce sceny Otwarcie">▮</button><button type="button" data-t="6">Belka</button><button type="button" data-t="8.6" data-stop="1" title="Zatrzymaj na klatce sceny Belka">▮</button><button type="button" data-t="11.5">Pojęcie</button><button type="button" data-t="14.6" data-stop="1" title="Zatrzymaj na klatce sceny Pojęcie">▮</button><button type="button" data-t="18.5">Schemat</button><button type="button" data-t="25.5" data-stop="1" title="Zatrzymaj na klatce sceny Schemat">▮</button><button type="button" data-t="29.5">Ćwiczenie</button><button type="button" data-t="36.2" data-stop="1" title="Zatrzymaj na klatce sceny Ćwiczenie">▮</button><button type="button" data-t="41">Zamknięcie</button><button type="button" data-t="46.6" data-stop="1" title="Zatrzymaj na klatce sceny Zamknięcie">▮</button></div>
+</main><script>'use strict';
+
+// Oś czasu: wszystkie animacje CSS są zatrzymane, a ich czas ustawiany jest stąd (odtwarzanie, suwak, skoki do scen).
+const TOTAL_SECONDS = 49.8;
+const MS = 1000;
+const STAGE_WIDTH = 1920;
+
+const ekran = document.querySelector('.ekran');
+const plan = document.querySelector('.plan');
+const wideo = document.querySelector('video');
+const suwak = document.getElementById('suwak');
+const licznik = document.getElementById('licznik');
+const przelacznik = document.getElementById('graj');
+
+const animacje = document.getAnimations();
+animacje.forEach((animacja) => animacja.pause());
+
+const params = new URLSearchParams(location.search);
+const stan = { czas: Number(params.get('t')) || 0, gra: !params.has('pauza'), ostatnia: null };
+
+function pokazCzas() {
+  animacje.forEach((animacja) => { animacja.currentTime = stan.czas * MS; });
+  suwak.value = String(stan.czas);
+  licznik.textContent = `${stan.czas.toFixed(1)} / ${TOTAL_SECONDS.toFixed(1)} s`;
+}
+
+function ustawGranie(gra) {
+  stan.gra = gra;
+  stan.ostatnia = null;
+  przelacznik.textContent = gra ? 'Pauza' : 'Odtwórz';
+  if (!gra) {
+    wideo.pause();
+    return;
+  }
+  wideo.play().catch((error) => console.warn('Wideo nie ruszyło samo, zostaje klatka zastępcza:', error.message));
+}
+
+function krok(teraz) {
+  if (stan.gra) {
+    const delta = stan.ostatnia === null ? 0 : (teraz - stan.ostatnia) / MS;
+    stan.ostatnia = teraz;
+    stan.czas = (stan.czas + delta) % TOTAL_SECONDS;
+    pokazCzas();
+  }
+  requestAnimationFrame(krok);
+}
+
+function skocz(sekundy) {
+  stan.czas = Math.min(Math.max(sekundy, 0), TOTAL_SECONDS);
+  stan.ostatnia = null;
+  pokazCzas();
+}
+
+function handleSuwakInput() {
+  skocz(Number(suwak.value));
+}
+
+function handleGrajClick() {
+  ustawGranie(!stan.gra);
+}
+
+function handleScenaClick(event) {
+  const cel = event.target.closest('button[data-t]');
+  if (!cel) return;
+  skocz(Number(cel.dataset.t));
+  if (cel.dataset.stop) ustawGranie(false);
+}
+
+function skaluj() {
+  plan.style.setProperty('--s', ekran.clientWidth / STAGE_WIDTH);
+}
+
+suwak.max = String(TOTAL_SECONDS);
+suwak.addEventListener('input', handleSuwakInput);
+przelacznik.addEventListener('click', handleGrajClick);
+document.querySelector('.ster').addEventListener('click', handleScenaClick);
+new ResizeObserver(skaluj).observe(ekran);
+skaluj();
+pokazCzas();
+ustawGranie(stan.gra);
+requestAnimationFrame(krok);
+</script></body></html>
